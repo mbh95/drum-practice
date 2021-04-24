@@ -4,41 +4,21 @@ import About from "./About";
 import Home from "./Home";
 import MidiMonitor from "./MidiMonitor";
 import MidiManager from "../midi/MidiManager";
+import {useAsync} from "react-async";
+
+export const MidiContext = React.createContext<MidiManager | undefined>(undefined);
 
 export default function App() {
-    // const midiManager = MidiManager.getInstance();
-
-    // console.log("App constructor.");
-
-    // const testPromise = new Promise((resolve, reject) => {
-    //     WebMidi.enable(function (err) {
-    //         if (err) {
-    //             console.log("WebMidi could not be enabled.", err);
-    //             reject();
-    //         } else {
-    //             console.log("WebMidi enabled!");
-    //             console.log(`Available inputs: ${WebMidi.inputs.map(i => i.name)}`);
-    //             resolve('foo');
-    //         }
-    //     });
-    // });
-    //
-    // testPromise
-
-    // WebMidi.enable(function (err) {
-    //     if (err) {
-    //         console.log("WebMidi could not be enabled.", err);
-    //     } else {
-    //         console.log("WebMidi enabled!");
-    //         console.log(`Available inputs: ${WebMidi.inputs.map(i => i.name)}`);
-    //     }
-    // });
-
-
-    // WebMidi.enabled;
-    return (
-        <div className="App">
-            <header className="App-header">
+    const {data, error, isPending} = useAsync({promiseFn: MidiManager.getInstance});
+    if (isPending) {
+        return <div>"Initializing MIDI..."</div>;
+    }
+    if (error) {
+        return <div>`Something went wrong: ${error.message}`</div>;
+    }
+    if (data) {
+        return (
+            <MidiContext.Provider value={data}>
                 <Router>
                     <nav>
                         <ul>
@@ -54,20 +34,18 @@ export default function App() {
                         </ul>
                     </nav>
                     <Switch>
-
                         <Route path="/about">
                             <About/>
                         </Route>
                         <Route path="/monitor">
-                            <MidiMonitor />
+                            <MidiMonitor/>
                         </Route>
                         <Route path="/">
                             <Home/>
                         </Route>
                     </Switch>
                 </Router>
-            </header>
-        </div>
-
-    );
+            </MidiContext.Provider>);
+    }
+    return null;
 }
