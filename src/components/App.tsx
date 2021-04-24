@@ -5,6 +5,7 @@ import Home from "./Home";
 import MidiMonitor from "./MidiMonitor";
 import MidiManager from "../midi/MidiManager";
 import {useAsync} from "react-async";
+import Metronome from "./Metronome";
 
 export const MidiContext = React.createContext<MidiManager | undefined>(undefined);
 
@@ -31,6 +32,9 @@ export default function App() {
                             <li>
                                 <Link to="/monitor">Monitor</Link>
                             </li>
+                            <li>
+                                <Link to="/metronome">Metronome</Link>
+                            </li>
                         </ul>
                     </nav>
                     <Switch>
@@ -39,6 +43,9 @@ export default function App() {
                         </Route>
                         <Route path="/monitor">
                             <MidiMonitor/>
+                        </Route>
+                        <Route path="/metronome">
+                            <Metronome bpm={60} />
                         </Route>
                         <Route path="/">
                             <Home/>
