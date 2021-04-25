@@ -45,7 +45,7 @@ export default function App() {
                             <MidiMonitor/>
                         </Route>
                         <Route path="/metronome">
-                            <Metronome bpm={1000} />
+                            <Metronome bpm={60} />
                         </Route>
                         <Route path="/">
                             <Home/>
