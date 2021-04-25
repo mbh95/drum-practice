@@ -17,5 +17,5 @@ export default function Metronome(props: { bpm: number }) {
         }
     }, [props.bpm]);
 
-    return <div> {count} </div>;
+    return <div> {count + 1} </div>;
 }
