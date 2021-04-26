@@ -22,7 +22,7 @@ export default class IntervalClock implements Clock {
     constructor(
         period: DurationMillis,
         tick: TickFn,
-        interval: DurationMillis = 20, // Default interval of 20ms means that this clock
+        interval: DurationMillis = 20,
         stopwatch = new Stopwatch()) {
         if (period <= 0) {
             throw new Error(`Period must be > 0, was ${period} ms.`);
