@@ -1,52 +1,56 @@
-export default class Stopwatch {
-    private running: boolean = false;
-    private mostRecentStart: number = 0;
-    private previouslyElapsedTime: number = 0;
+import {DurationMillis, InstantMillis, TimeSourceMillis} from "./Units";
 
-    start() {
-        if (this.running) {
-            console.error("Tried to start a running stopwatch!");
-            return;
-        }
-        this.mostRecentStart = performance.now();
-        this.running = true;
+export default class Stopwatch {
+    private readonly now: TimeSourceMillis;
+    private startTime?: InstantMillis;
+    private elapsed: DurationMillis = 0;
+
+    /**
+     * Create a stopwatch based on a time source.
+     *
+     * @param {TimeSource} now - Monotonic time source that returns the current time in milliseconds. Defaults to performance.now().
+     */
+    constructor(now: TimeSourceMillis = () => performance.now()) {
+        this.now = now;
     }
 
-    isRunning() {
-        return this.running;
+    isRunning(): boolean {
+        return this.startTime !== undefined;
+    }
+
+    start(): void {
+        if (this.isRunning()) {
+            throw new Error("Tried to start a running stopwatch!");
+        }
+        this.startTime = this.now();
     }
 
     stop() {
-        if (!this.running) {
-            console.error("Tried to stop a stopped stopwatch!");
-            return;
+        if (!this.isRunning()) {
+            throw new Error("Tried to stop a stopped stopwatch!");
         }
-        this.previouslyElapsedTime = this.elapsedUpTo(performance.now());
-        this.running = false;
+        this.elapsed = this.getElapsed();
     }
 
-    reset() {
-        this.previouslyElapsedTime = 0;
-        this.running = false;
+    getElapsed(): DurationMillis {
+        return this.getElapsedUpTo(this.now());
     }
 
-    elapsed() {
-        return this.elapsedUpTo(performance.now());
-    }
-
-    clear() {
-        const clearTime = performance.now();
-        const elapsed = this.elapsedUpTo(clearTime);
-        this.mostRecentStart = clearTime;
-        this.previouslyElapsedTime = 0;
+    getElapsedAndReset(): DurationMillis {
+        const resetTime = this.now();
+        const elapsed = this.getElapsedUpTo(resetTime);
+        if (this.isRunning()) {
+            this.startTime = resetTime;
+        }
+        this.elapsed = 0;
         return elapsed;
     }
 
-    private elapsedUpTo(t: number) {
-        if (this.running) {
-            return this.previouslyElapsedTime + (t - this.mostRecentStart);
+    private getElapsedUpTo(t: InstantMillis): DurationMillis {
+        if (this.isRunning()) {
+            return this.elapsed + (t - this.startTime!);
         } else {
-            return this.previouslyElapsedTime;
+            return this.elapsed;
         }
     }
 }
