@@ -1,10 +1,10 @@
 import Stopwatch from "./stopwatch";
 import Clock, {TickFn} from "./clock";
 import {DurationMillis} from "./units";
-import IntertClock from "./intert-clock";
+import InertClock from "./inert-clock";
 
 export default class IntervalClock implements Clock {
-    private readonly internalClock: IntertClock;
+    private readonly internalClock: InertClock;
     /**
      * How often the clock should try to update (accumulate time and call the tick function).
      *
@@ -28,7 +28,7 @@ export default class IntervalClock implements Clock {
             throw new Error(`Period must be > 0, was ${period} ms.`);
         }
         this.interval = interval;
-        this.internalClock = new IntertClock(period, tick, stopwatch);
+        this.internalClock = new InertClock(period, tick, stopwatch);
     }
 
     isRunning(): boolean {
