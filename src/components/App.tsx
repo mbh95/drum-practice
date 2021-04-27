@@ -3,7 +3,7 @@ import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
 import About from "./About";
 import Home from "./Home";
 import MidiMonitor from "./MidiMonitor";
-import MidiManager from "../midi/MidiManager";
+import MidiManager from "../midi/midi-manager";
 import {useAsync} from "react-async";
 import Metronome from "./Metronome";
 

@@ -1,4 +1,4 @@
-import {DurationMillis, InstantMillis, TimeSourceMillis} from "./Units";
+import {DurationMillis, InstantMillis, TimeSourceMillis} from "./units";
 
 export default class Stopwatch {
     private readonly now: TimeSourceMillis;

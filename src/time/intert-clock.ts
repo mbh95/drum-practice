@@ -1,8 +1,8 @@
-import Stopwatch from "./Stopwatch";
-import Clock, {TickFn} from "./Clock";
-import {DurationMillis, InstantMillis} from "./Units";
+import Stopwatch from "./stopwatch";
+import Clock, {TickFn} from "./clock";
+import {DurationMillis, InstantMillis} from "./units";
 
-export default class InertClock implements Clock {
+export default class IntertClock implements Clock {
     private readonly tick: TickFn;
     private readonly stopwatch: Stopwatch;
     private readonly period: DurationMillis; // Time between ticks.

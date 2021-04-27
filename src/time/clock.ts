@@ -1,4 +1,4 @@
-import {DurationMillis, InstantMillis} from "./Units";
+import {DurationMillis, InstantMillis} from "./units";
 
 export type TickFn = (t: InstantMillis, dt: DurationMillis) => void;
 

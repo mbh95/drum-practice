@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import IntervalClock from "../time/IntervalClock";
+import IntervalClock from "../time/interval-clock";
 
 export default function Metronome(props: { bpm: number }) {
     const [count, setCount] = useState<number>(0);
