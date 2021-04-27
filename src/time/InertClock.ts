@@ -7,7 +7,7 @@ export default class InertClock implements Clock {
     private readonly stopwatch: Stopwatch;
     private readonly period: DurationMillis; // Time between ticks.
     private previousTick: InstantMillis = 0;
-    private accumlatedTime: DurationMillis = 0;
+    private accumulatedTime: DurationMillis = 0;
 
     constructor(
         period: DurationMillis,
@@ -50,13 +50,13 @@ export default class InertClock implements Clock {
             throw new Error("Tried to update a stopped clock!");
         }
 
-        this.accumlatedTime += this.stopwatch.getElapsedAndReset();
+        this.accumulatedTime += this.stopwatch.getElapsedAndReset();
 
-        while (this.accumlatedTime >= this.period) {
+        while (this.accumulatedTime >= this.period) {
             this.previousTick += this.period;
             this.tick(this.previousTick, this.period);
-            this.accumlatedTime -= this.period;
+            this.accumulatedTime -= this.period;
         }
-        return this.accumlatedTime / this.period;
+        return this.accumulatedTime / this.period;
     }
 }
