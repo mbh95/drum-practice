@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@types/react-router-dom": "^5.1.7",
-    "@types/webmidi": "^2.0.4"
+    "@types/webmidi": "^2.0.4",
+    "worker-loader": "^3.0.8"
   }
 }

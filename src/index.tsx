@@ -4,6 +4,9 @@ import './index.css';
 import App from './components/App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import Worker from "worker-loader!./time/Interval.worker";
 
 ReactDOM.render(
   <React.StrictMode>
@@ -11,6 +14,18 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+const worker = new Worker();
+
+worker.postMessage({ a: 1 });
+worker.onmessage = (event: MessageEvent) => {
+    console.log(event);
+};
+
+worker.addEventListener("message", (event: MessageEvent) => {
+    console.log("event");
+});
+
+
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
