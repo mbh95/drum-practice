@@ -6,7 +6,7 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 // @ts-ignore
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import Worker from "worker-loader!./time/interval.worker";
+import Worker from "worker-loader!./workers/interval.worker";
 
 ReactDOM.render(
   <React.StrictMode>

@@ -1,4 +1,4 @@
-export default {};
+export {};
 
 // eslint-disable-next-line no-restricted-globals
 const ctx: Worker = self as any;
@@ -7,7 +7,7 @@ let timerID: NodeJS.Timeout | undefined;
 let interval = 100;
 
 ctx.onmessage = function (e: MessageEvent) {
-    if (e.data == "start") {
+    if (e.data === "start") {
         console.log("starting");
         timerID = setInterval(function () {
             postMessage("tick");
@@ -22,7 +22,7 @@ ctx.onmessage = function (e: MessageEvent) {
                 postMessage("tick");
             }, interval)
         }
-    } else if (e.data == "stop") {
+    } else if (e.data === "stop") {
         console.log("stopping");
         if (timerID) {
             clearInterval(timerID);
@@ -30,5 +30,3 @@ ctx.onmessage = function (e: MessageEvent) {
         }
     }
 };
-
-postMessage('hi there');
