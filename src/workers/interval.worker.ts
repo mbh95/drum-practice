@@ -8,14 +8,12 @@ let interval = 100;
 
 ctx.onmessage = function (e: MessageEvent) {
     if (e.data === "start") {
-        console.log("starting");
+        console.log(`Interval web worker starting with an interval of ${interval}ms...`);
         timerID = setInterval(function () {
             postMessage("tick");
         }, interval)
     } else if (e.data.interval) {
-        console.log("setting interval");
         interval = e.data.interval;
-        console.log("interval=" + interval);
         if (timerID) {
             clearInterval(timerID);
             timerID = setInterval(function () {
@@ -23,7 +21,7 @@ ctx.onmessage = function (e: MessageEvent) {
             }, interval)
         }
     } else if (e.data === "stop") {
-        console.log("stopping");
+        console.log(`Interval web worker stopping...`);
         if (timerID) {
             clearInterval(timerID);
             timerID = undefined;

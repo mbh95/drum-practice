@@ -3,6 +3,10 @@ import Clock, {TickFn} from "./clock";
 import {DurationMillis} from "./units";
 import InertClock from "./inert-clock";
 
+// @ts-ignore
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import IntervalWorker from "worker-loader!../workers/interval.worker";
+
 export default class IntervalClock implements Clock {
     private readonly internalClock: InertClock;
     /**
@@ -17,7 +21,7 @@ export default class IntervalClock implements Clock {
      * Defaults to 20ms.
      */
     private readonly interval: DurationMillis;
-    private intervalId?: NodeJS.Timeout; // Handle for the scheduled interval. Used to cancel scheduling with clearInterval().
+    private intervalWorker?: IntervalWorker;
 
     constructor(
         period: DurationMillis,
@@ -27,12 +31,12 @@ export default class IntervalClock implements Clock {
         if (period <= 0) {
             throw new Error(`Period must be > 0, was ${period} ms.`);
         }
-        this.interval = interval;
         this.internalClock = new InertClock(period, tick, stopwatch);
+        this.interval = interval;
     }
 
     isRunning(): boolean {
-        return this.internalClock.isRunning() && this.intervalId !== undefined;
+        return this.internalClock.isRunning() && this.intervalWorker !== undefined;
     }
 
     start() {
@@ -40,7 +44,14 @@ export default class IntervalClock implements Clock {
             throw new Error("Tried to start a running clock!");
         }
         this.internalClock.start();
-        this.intervalId = setInterval(() => this.internalClock.update(), 20);
+        this.intervalWorker = new IntervalWorker();
+        this.intervalWorker.postMessage({interval: this.interval});
+        this.intervalWorker.onmessage = (e) => {
+            if (e.data === "tick") {
+                this.internalClock.update();
+            }
+        };
+        this.intervalWorker.postMessage("start");
     }
 
     stop() {
@@ -48,7 +59,9 @@ export default class IntervalClock implements Clock {
             throw new Error("Tried to stop a stopped clock!");
         }
         this.internalClock.stop();
-        clearInterval(this.intervalId!);
-        this.intervalId = undefined;
+        if (this.intervalWorker !== undefined) {
+            this.intervalWorker.postMessage("stop");
+            this.intervalWorker.terminate();
+        }
     }
 }
