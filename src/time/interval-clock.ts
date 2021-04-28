@@ -2,10 +2,7 @@ import Stopwatch from "./stopwatch";
 import Clock, {TickFn} from "./clock";
 import {DurationMillis} from "./units";
 import InertClock from "./inert-clock";
-
-// @ts-ignore
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import IntervalWorker from "worker-loader!../workers/interval.worker";
+import IntervalClient from "../workers/interval/interval-client";
 
 export default class IntervalClock implements Clock {
     private readonly internalClock: InertClock;
@@ -21,7 +18,7 @@ export default class IntervalClock implements Clock {
      * Defaults to 20ms.
      */
     private readonly interval: DurationMillis;
-    private intervalWorker?: IntervalWorker;
+    private intervalClient?: IntervalClient;
 
     constructor(
         period: DurationMillis,
@@ -36,7 +33,7 @@ export default class IntervalClock implements Clock {
     }
 
     isRunning(): boolean {
-        return this.internalClock.isRunning() && this.intervalWorker !== undefined;
+        return this.internalClock.isRunning();
     }
 
     start() {
@@ -44,14 +41,10 @@ export default class IntervalClock implements Clock {
             throw new Error("Tried to start a running clock!");
         }
         this.internalClock.start();
-        this.intervalWorker = new IntervalWorker();
-        this.intervalWorker.postMessage({interval: this.interval});
-        this.intervalWorker.onmessage = (e) => {
-            if (e.data === "tick") {
-                this.internalClock.update();
-            }
-        };
-        this.intervalWorker.postMessage("start");
+        this.intervalClient = new IntervalClient(
+            this.interval,
+            () => this.internalClock.update()
+        ).start();
     }
 
     stop() {
@@ -59,9 +52,8 @@ export default class IntervalClock implements Clock {
             throw new Error("Tried to stop a stopped clock!");
         }
         this.internalClock.stop();
-        if (this.intervalWorker !== undefined) {
-            this.intervalWorker.postMessage("stop");
-            this.intervalWorker.terminate();
+        if (this.intervalClient !== undefined) {
+            this.intervalClient.stop().terminate();
         }
     }
 }
