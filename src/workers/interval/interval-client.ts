@@ -1,7 +1,10 @@
 // eslint-disable-next-line no-restricted-globals,import/no-webpack-loader-syntax
 import IntervalWorker from "worker-loader!./interval.worker";
-import {IntervalMessageType, SetIntervalMessage} from "./interval-messages";
+import {IntervalMessageType, SetIntervalMessage,} from "./interval-messages";
 
+/**
+ * Friendly wrapper around the Worker message API used by the interval worker.
+ */
 export default class IntervalClient {
     private readonly worker: IntervalWorker;
     private tickFn: () => void;
@@ -9,7 +12,7 @@ export default class IntervalClient {
     constructor(interval: number, tickFn: () => void) {
         this.tickFn = tickFn;
         this.worker = new IntervalWorker();
-        this.worker.onmessage = (e:MessageEvent) => this.messageHandler(e);
+        this.worker.onmessage = (e: MessageEvent) => this.messageHandler(e);
         this.setTickFn(tickFn);
         this.setInterval(interval);
     }

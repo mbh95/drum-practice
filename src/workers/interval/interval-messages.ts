@@ -1,3 +1,6 @@
+/**
+ * Types shared by interval.worker and WorkerClient.
+ */
 export enum IntervalMessageType {
     START = "START",
     STOP = "STOP",

@@ -10,7 +10,7 @@ const tick = () => {
     postMessage(IntervalMessageType.TICK);
 }
 
-ctx.onmessage = function (e: MessageEvent) {
+ctx.addEventListener("message", (e: MessageEvent) => {
     if (e.data === IntervalMessageType.START) {
         console.log(`Interval web worker starting with an interval of ${interval}ms...`);
         timerID = setInterval(tick, interval)
@@ -20,11 +20,11 @@ ctx.onmessage = function (e: MessageEvent) {
             clearInterval(timerID);
             timerID = undefined;
         }
-    } else if (e.data.interval) {
+    } else if (e.data.type === IntervalMessageType.SET_INTERVAL && e.data.interval) {
         interval = e.data.interval;
         if (timerID) {
             clearInterval(timerID);
-            timerID = setInterval(tick, interval)
+            timerID = setInterval(tick, interval);
         }
     }
-};
+});
