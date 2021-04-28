@@ -14,16 +14,31 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-const worker = new Worker();
 
-worker.postMessage({ a: 1 });
-worker.onmessage = (event: MessageEvent) => {
-    console.log(event);
+console.log("Creating worker.");
+const worker100 = new Worker();
+const worker1000 = new Worker();
+worker1000.postMessage({"interval": 1000});
+
+
+worker100.onmessage = function(e) {
+    if (e.data === "tick") {
+        console.log("tick!");
+    }
+    else
+        console.log("message: " + e.data);
 };
 
-worker.addEventListener("message", (event: MessageEvent) => {
-    console.log("event");
-});
+worker1000.onmessage = function(e) {
+    if (e.data === "tick") {
+        console.log("TOCK!");
+    }
+    else
+        console.log("MESSAGE: " + e.data);
+};
+worker100.postMessage("start");
+worker1000.postMessage("start");
+
 
 
 
