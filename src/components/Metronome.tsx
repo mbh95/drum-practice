@@ -9,10 +9,17 @@ export default function Metronome(props: { bpm: number, running: boolean }) {
     let scheduledNotesRef = useRef<number[]>([]);
     let canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const [count, setCount] = useState<number>(0);
+    const [count, setCount] = useState<number>(3);
     const advanceCount = () => {
         setCount(c => (c + 1) % 4);
     };
+
+    // Draw initial state.
+    useEffect(() => {
+        const ctx = canvasRef.current!.getContext("2d")!;
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
+    }, []);
 
     // Render an animation.
     useEffect(() => {
@@ -57,7 +64,7 @@ export default function Metronome(props: { bpm: number, running: boolean }) {
 
         const audioCtx = audioCtxRef.current!;
         audioCtx.resume();
-        // Schduling the first note takes some time, so if we don't add some time it will get cut off.
+        // Scheduling the first note takes some time, so if we don't add some time it will get cut off.
         let nextNoteTimeSec = audioCtx.currentTime + 0.1;
 
         const schedule = () => {
