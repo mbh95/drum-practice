@@ -1,25 +1,24 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useContext, useEffect, useRef, useState} from "react";
 import IntervalClient from "../workers/interval/interval-client";
+import {AudioContextContext} from "./App";
 
-export default function Metronome(props: { bpm: number }) {
+export default function Metronome(props: { bpm: number, running: boolean }) {
+    const maybeAudioContext = useContext(AudioContextContext);
+
+    const audioCtxRef = useRef<AudioContext>(maybeAudioContext!);
+    let scheduledNotesRef = useRef<number[]>([]);
+    let canvasRef = useRef<HTMLCanvasElement>(null);
+
     const [count, setCount] = useState<number>(0);
     const advanceCount = () => {
         setCount(c => (c + 1) % 4);
     };
-    let scheduledNotesRef = useRef<number[]>([]);
-    let audioCtxRef = useRef<AudioContext>();
-    let canvasRef = useRef<HTMLCanvasElement>(null);
-
-    // Create the audio context.
-    useEffect(() => {
-        audioCtxRef.current = new AudioContext();
-        return () => {
-            audioCtxRef.current?.close();
-        }
-    }, []);
 
     // Render an animation.
     useEffect(() => {
+        if (!props.running) {
+            return;
+        }
         let requestId: number;
         const render = () => {
             const ctx = canvasRef.current!.getContext("2d")!;
@@ -33,27 +32,32 @@ export default function Metronome(props: { bpm: number }) {
             }
             // Why aren't width and height 100???
             // console.log(`width: ${canvasRef.current!.width}, height: ${canvasRef.current!.height}`);
-            ctx.fillRect(0,0,canvasRef.current!.width,canvasRef.current!.height);
+            ctx.fillRect(0, 0, canvasRef.current!.width, canvasRef.current!.height);
             requestId = requestAnimationFrame(render);
         };
         render();
         return () => {
             cancelAnimationFrame(requestId);
         }
-    }, [props.bpm]);
+
+    }, [props.running]);
 
     // Schedule note sounds.
     useEffect(() => {
+        if (!props.running) {
+            return;
+        }
         const secsPerBeat = 60.0 / props.bpm;
 
-        const scheduleAheadSecs = 1.0
+        const scheduleAheadSecs = 0.1
         const intervalSecs = scheduleAheadSecs / 2.0;
         const intervalMillis = 1000 * intervalSecs;
 
         const beepLenSecs = 0.1;
 
         const audioCtx = audioCtxRef.current!;
-        let nextNoteTimeSec = audioCtx.currentTime + 10 * beepLenSecs;
+        audioCtx.resume();
+        let nextNoteTimeSec = audioCtx.currentTime + 0.1;
 
         const schedule = () => {
             while (nextNoteTimeSec <= audioCtx.currentTime + scheduleAheadSecs) {
@@ -67,11 +71,10 @@ export default function Metronome(props: { bpm: number }) {
             }
         }
         const intervalClient = new IntervalClient(intervalMillis, schedule).start();
-
         return () => {
-            intervalClient.terminate();
+            intervalClient.stop().terminate();
         }
-    }, [props.bpm]);
+    }, [props.bpm, props.running]);
 
     return <div>
         <canvas ref={canvasRef} style={{width: '100px', height: '100px'}}/>

@@ -1,25 +1,30 @@
 import React from 'react';
-import {BrowserRouter as Router, Switch, Route, Link} from "react-router-dom";
+import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 import About from "./About";
 import Home from "./Home";
 import MidiMonitor from "./MidiMonitor";
 import MidiManager from "../midi/midi-manager";
 import {useAsync} from "react-async";
-import Metronome from "./Metronome";
+import MetronomeController from "./MetronomeController";
 
-export const MidiContext = React.createContext<MidiManager | undefined>(undefined);
+export const MidiManagerContext = React.createContext<MidiManager | undefined>(undefined);
+export const AudioContextContext = React.createContext<AudioContext | undefined>(undefined);
 
 export default function App() {
-    const {data, error, isPending} = useAsync({promiseFn: MidiManager.getInstance});
-    if (isPending) {
-        return <div>"Initializing MIDI..."</div>;
+    const midiSetup = useAsync({promiseFn: MidiManager.getInstance});
+
+    if (!midiSetup.data) {
+        return (<div>
+            {midiSetup.error
+                ? "Failed to initialize MIDI."
+                : midiSetup.isPending
+                    ? "Initializing MIDI..."
+                    : "Done initializing MIDI."}a
+        </div>);
     }
-    if (error) {
-        return <div>`Something went wrong: ${error.message}`</div>;
-    }
-    if (data) {
-        return (
-            <MidiContext.Provider value={data}>
+    return (
+        <AudioContextContext.Provider value={new AudioContext()}>
+            <MidiManagerContext.Provider value={midiSetup.data}>
                 <Router>
                     <nav>
                         <ul>
@@ -45,14 +50,13 @@ export default function App() {
                             <MidiMonitor/>
                         </Route>
                         <Route path="/metronome">
-                            <Metronome bpm={60} />
+                            <MetronomeController/>
                         </Route>
                         <Route path="/">
                             <Home/>
                         </Route>
                     </Switch>
                 </Router>
-            </MidiContext.Provider>);
-    }
-    return null;
+            </MidiManagerContext.Provider>
+        </AudioContextContext.Provider>);
 }
