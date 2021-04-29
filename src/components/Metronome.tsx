@@ -57,6 +57,7 @@ export default function Metronome(props: { bpm: number, running: boolean }) {
 
         const audioCtx = audioCtxRef.current!;
         audioCtx.resume();
+        // Schduling the first note takes some time, so if we don't add some time it will get cut off.
         let nextNoteTimeSec = audioCtx.currentTime + 0.1;
 
         const schedule = () => {

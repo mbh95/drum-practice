@@ -13,6 +13,7 @@ const tick = () => {
 ctx.addEventListener("message", (e: MessageEvent) => {
     if (e.data === IntervalMessageType.START) {
         console.log(`Interval web worker starting with an interval of ${interval}ms...`);
+        tick();
         timerID = setInterval(tick, interval)
     } else if (e.data === IntervalMessageType.STOP) {
         console.log(`Interval web worker stopping...`);
